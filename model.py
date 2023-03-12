@@ -93,3 +93,51 @@ class JointEmbedding(nn.Module):
         #Extend pos on every element in batch
         return pos.expand(batch_size, *pos.size())
 
+class AttentionHead(nn.Module):
+    """
+    The attention module using scaled dot-product attention
+
+    Attribute innput_dim: The input dimensions 
+    Invariant: int
+
+    Attribute q: Query 
+    Invariant: Tensor
+
+    Attribute K: Key
+    Invariant: Tensor
+
+    Attribute V: Value
+    Invariant: Tensor
+    """
+    def __init__(self, input_dim, output_dim):
+        super(AttentionHead, self).__init__()
+
+        self.input_dim = input_dim
+
+        self.q = nn.Linear(input_dim, output_dim)  
+        self.k = nn.Linear(input_dim, output_dim)  
+        self.v = nn.Linear(input_dim, output_dim) 
+
+    def forward(self, input_tensor: torch.Tensor, attention_mask: torch.Tensor = None):
+        """
+        A function that does Scaled Dot Product
+
+        Parameter input_tensor: The tensor of the output of JointEmbedding
+        Precondition: torch.tensor
+
+        Parameter attention_mask: Attention mask vector tgar masks [PAD] tokens
+        Precondition: torch.tensor
+        """
+        #Calculate query, key and value tensors
+        query, key, value = self.q(input_tensor), self.k(input_tensor), self.v(input_tensor)
+
+        #Scaled multiplication of query and key using batched matrix multiplication
+        scores = torch.bmm(query, key.transpose(1, 2)) / (query.size(1) ** 0.5)  
+
+        #Fill elements where attention mask is True to -1e9
+        scores = scores.masked_fill_(attention_mask, -1e9)  
+        #Calculate attention score for the rest of the elements
+        attn = f.softmax(scores, dim=-1)  
+        context = torch.bmm(attn, value)  
+  
+        return context
