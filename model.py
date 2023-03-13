@@ -142,33 +142,29 @@ class AttentionHead(nn.Module):
   
         return context
     
-    class MultiHeadAttention(nn.module):
-        """
-        Parallel AttentionHeads which retreives information from multiple representations 
-
-        Attribute heads: A list of all the Attention Heads
-        Invariant: ModuleList
-
-        Attribute Linear: Linear tranformation of data
-        Invariant: Tensor
-
-        Attribute norm: Layer normalization
-        Invariant: Tensor
-        """
-        def __init__(self, num_heads, dim_inp, dim_out) -> None:
-            super(MultiHeadAttention, self).__init__():
-            
-            self.heads = nn.ModuleList(ScaledDotProductAttention(dim_inp, dim_out) for _ in range(num_heads))
-            self.linear = nn.Linear(dim_out * num_heads, dim_inp)
-            self.norm = nn.LayerNorm(dim_inp)
-
-        def forward(self, input_tensor: torch.Tensor, attention_mask: torch.Tensor):  
-            #List of attention
-            s = [head(input_tensor, attention_mask) for head in self.heads]  
-            #Concatenate tensors by last axis
-            scores = torch.cat(s, dim=-1)  
-            #Linear transformation
-            scores = self.linear(scores)  
-            #Normalization
-            norm_scores = self.norm(scores)
-            return norm_scores
+class MultiHeadAttention(nn.module):
+    """
+    Parallel AttentionHeads which retreives information from multiple representations 
+    Attribute heads: A list of all the Attention Heads
+    Invariant: ModuleList
+    Attribute Linear: Linear tranformation of data
+    Invariant: Tensor
+    Attribute norm: Layer normalization
+    Invariant: Tensor
+    """
+    def __init__(self, num_heads, dim_inp, dim_out) -> None:
+        super(MultiHeadAttention, self).__init__():
+        
+        self.heads = nn.ModuleList(ScaledDotProductAttention(dim_inp, dim_out) for _ in range(num_heads))
+        self.linear = nn.Linear(dim_out * num_heads, dim_inp)
+        self.norm = nn.LayerNorm(dim_inp)
+    def forward(self, input_tensor: torch.Tensor, attention_mask: torch.Tensor):  
+        #List of attention
+        s = [head(input_tensor, attention_mask) for head in self.heads]  
+        #Concatenate tensors by last axis
+        scores = torch.cat(s, dim=-1)  
+        #Linear transformation
+        scores = self.linear(scores)  
+        #Normalization
+        norm_scores = self.norm(scores)
+        return norm_scores
