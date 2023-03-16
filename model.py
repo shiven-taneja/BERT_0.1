@@ -37,7 +37,7 @@ class JointEmbedding(nn.Module):
     Invariant: Tensor
     """
     def __init__ (self, vocab_size, size):
-        super(JointEmbedding, self).__init__
+        super(JointEmbedding, self).__init__()
 
         self.size = size
 
@@ -61,7 +61,7 @@ class JointEmbedding(nn.Module):
         seg_tensor = seg_tensor[:, sentence_size // 2 + 1:] = 1
 
         #Sum all the encoding then normalize them
-        output = self.tok_emb(input_tensor) + self.seg_emb(seg_tensor) + pos_tensor
+        output = self.tok_embed(input_tensor) + self.seg_embed(seg_tensor) + pos_tensor
         return self.norm(output)
     
     def attention_position(self, dim, input_tensor):
@@ -141,3 +141,136 @@ class AttentionHead(nn.Module):
         context = torch.bmm(attn, value)  
   
         return context
+    
+class MultiHeadAttention(nn.Module):
+    """
+    Parallel AttentionHeads which retreives information from multiple representations 
+
+    Attribute heads: A list of all the Attention Heads
+    Invariant: ModuleList
+
+    Attribute Linear: Linear tranformation of data
+    Invariant: Tensor
+
+    Attribute norm: Layer normalization
+    Invariant: Tensor
+    """
+    def __init__(self, num_heads, dim_inp, dim_out) -> None:
+        super(MultiHeadAttention, self).__init__()
+        
+        self.heads = nn.ModuleList(AttentionHead(dim_inp, dim_out) for _ in range(num_heads))
+        self.linear = nn.Linear(dim_out * num_heads, dim_inp)
+        self.norm = nn.LayerNorm(dim_inp)
+    def forward(self, input_tensor: torch.Tensor, attention_mask: torch.Tensor):  
+        #List of attention
+        s = [head(input_tensor, attention_mask) for head in self.heads]  
+        #Concatenate tensors by last axis
+        scores = torch.cat(s, dim=-1)  
+        #Linear transformation
+        scores = self.linear(scores)  
+        #Normalization
+        norm_scores = self.norm(scores)
+        return norm_scores
+    
+
+class Encoder(nn.Module):
+    """
+    An encoder layer that has a Multi-Head Attention Layer and a Feed Forward Network 
+
+    Attribute attention: Multi-head attention layer 
+    Invariant: Tensor
+
+    Attribute norm1: Layer normalization 
+    Invariant: Tensor
+
+    Attribute feed_forward: Position wise feed-forward network
+    Invariant: Instance of nn.Sequential class
+
+    Attribute norm2: Layer normalization 
+    Invariant: Tensor
+
+
+    """
+    def __init__(self, dim_inp, dim_out, attention_heads=4, dropout=0.1):
+        super(Encoder, self).__init__()
+
+        # Instantiate the multi-head attention layer
+        self.attention = MultiHeadAttention(attention_heads, dim_inp, dim_out)
+        # Instantiate the layer normalization for the attention layer
+        self.norm1 = nn.LayerNorm(dim_inp)
+
+         # Define the feed-forward network
+        self.feed_forward = nn.Sequential(
+            nn.Linear(dim_inp, dim_inp * 4),  # Linear layer to increase dimensionality
+            nn.GELU(),  # GELU activation function
+            nn.Dropout(dropout),  # Dropout layer for regularization
+            nn.Linear(dim_inp * 4, dim_inp),  # Linear layer to decrease dimensionality back to original size
+            nn.Dropout(dropout)  # Dropout layer for regularization
+        )
+        # Instantiate the layer normalization for the feed-forward layer
+        self.norm2 = nn.LayerNorm(dim_inp)
+
+    def forward(self, input_tensor: torch.Tensor, attention_mask: torch.Tensor):
+        # Pass the input tensor through the multi-head attention layer
+        attention_output = self.attention(input_tensor, attention_mask)
+        # Apply residual connection and layer normalization
+        attention_output = self.norm1(input_tensor + attention_output)
+
+        # Pass the attention_output through the feed-forward network
+        feed_forward_output = self.feed_forward(attention_output)
+        # Apply residual connection and layer normalization
+        return self.norm2(attention_output + feed_forward_output)
+
+
+class BERT(nn.Module):
+    """
+    Container that combines all modules 
+
+    Attribute embedding: Embedding Layer
+    Invariant: Tensor
+
+    Attribute encoders: List of Encoder Layers 
+    Invariant: List[Tensor]
+
+    Attribute token_predicition_layer: Token predicition layer
+    Invariant: Tensor
+
+    Attribute softmax: Applies Softmax 
+    Invariant: Tensor 
+
+    Attribute classifiction_layer: Classification layer
+    Invariant: Tensor
+    """
+    def __init__(self, vocab_size, dim_inp, dim_out, attention_heads=4, num_layers=2):
+        super(BERT, self).__init__()
+
+        # Instantiate the joint embedding layer (token and positional embeddings)
+        self.embedding = JointEmbedding(vocab_size, dim_inp)
+        # Create a list of Encoder layers
+        self.encoders = nn.ModuleList([
+            Encoder(dim_inp, dim_out, attention_heads) for _ in range(num_layers)
+        ])
+
+        # Define the token prediction layer for masked language modeling
+        self.token_prediction_layer = nn.Linear(dim_inp, vocab_size)
+        # Define the softmax activation for token predictions
+        self.softmax = nn.LogSoftmax(dim=-1)
+        # Define the classification layer for next sentence prediction
+        self.classification_layer = nn.Linear(dim_inp, 2)
+
+    def forward(self, input_tensor: torch.Tensor, attention_mask: torch.Tensor):
+        # Pass the input tensor through the joint embedding layer
+        embedded = self.embedding(input_tensor)
+
+        # Pass the embedded input through the encoder layers
+        encoded = embedded
+        for encoder in self.encoders:
+            encoded = encoder(encoded, attention_mask)
+
+        # Compute token predictions from the encoded output
+        token_predictions = self.token_prediction_layer(encoded)
+
+        # Extract the first token's representation for next sentence prediction
+        first_word = encoded[:, 0, :]
+        # Return the token predictions and next sentence predictions
+        return self.softmax(token_predictions), self.classification_layer(first_word)
