@@ -8,7 +8,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-#from dataset import IMDBBertDataset
+from dataset import WikitextBertDataset
 from model import BERT
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -86,7 +86,7 @@ class BertTrainer:
 
     def __init__(self,
                  model: BERT,
-                 dataset: Dataset***,
+                 dataset: WikitextBertDataset,
                  log_dir: Path,
                  checkpoint_dir: Path = None,
                  print_progress_every: int = 10,
