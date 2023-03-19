@@ -87,8 +87,8 @@ class BertTrainer:
     def __init__(self,
                  model: BERT,
                  dataset: WikitextBertDataset,
-                 log_dir: Path,
-                 checkpoint_dir: Path = None,
+                 log_dir: Path = Path("\logs"),
+                 checkpoint_dir: Path = Path("\Checkpoints"),
                  print_progress_every: int = 10,
                  print_accuracy_every: int = 50,
                  batch_size: int = 24,
@@ -188,10 +188,16 @@ class BertTrainer:
 
     def training_summary(self, elapsed, index, average_nsp_loss, average_mlm_loss):
         """
-        Create a string summary of the training progress
+        Create a summary of the training progress
 
         Args: 
-            #TODO Finish Docstrings and comments
+            elapsed (time.struct_time): Elapsed time 
+            index (int): Current batch index 
+            average_nsp_loss (float): Accumulated NSP Loss 
+            average_mlm_loss (float): Accumulated MLM Loss
+        
+        Return: 
+            s (string): String of the summary of the training progress
         """
         passed = percentage(self.batch_size, self._ds_len, index)
         global_step = self.current_epoch * len(self.loader) + index
@@ -208,6 +214,19 @@ class BertTrainer:
         return s
 
     def accuracy_summary(self, index, token, nsp, token_target, nsp_target, inverse_token_mask):
+        """
+        Create a summary of the accuracy
+
+       Args: 
+            index (int): Current batch index 
+            token (Tensor): The token logits calculated by the model
+            nsp (Tensor): The NSP logits calculated by the model
+            token_target (Tensor): The target tokens for MLM
+            nsp_target (Tensor): The target labels for NSP
+            inverse_token_mask (Tensor): The inverse token mask to be used for MLM accuracy calculation
+        Return: 
+            String of the summary of the accuracy metrics 
+        """
         global_step = self.current_epoch * len(self.loader) + index
         nsp_acc = nsp_accuracy(nsp, nsp_target)
         token_acc = token_accuracy(token, token_target, inverse_token_mask)
@@ -218,6 +237,13 @@ class BertTrainer:
         return f" | NSP accuracy {nsp_acc} | Token accuracy {token_acc}"
 
     def save_checkpoint(self, epoch, step, loss):
+        """
+        Save a checkpoint
+        Args:
+            epoch (int): The current epoch number.
+            step (int): The current step number within the epoch.
+            loss (float): The loss value at the current step.
+        """
         if not self.checkpoint_dir:
             return
 
@@ -238,6 +264,12 @@ class BertTrainer:
         print()
 
     def load_checkpoint(self, path: Path):
+        """
+        Load a checkpoint 
+
+        Args:
+            path (Path): The path to the checkpoint file to load.
+        """
         print('=' * self._splitter_size)
         print(f"Restoring model {path}")
         checkpoint = torch.load(path)
