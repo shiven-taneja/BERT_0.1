@@ -213,7 +213,7 @@ class BERT(nn.Module):
         softmax (Tensor): Applies Softmax 
         classifiction_layer (Tensor): Classification layer
     """
-    def __init__(self, vocab_size, dim_inp, dim_out, attention_heads=4, num_layers=12):
+    def __init__(self, vocab_size, dim_inp, dim_out, attention_heads=12, num_layers=12):
         super(BERT, self).__init__()
 
         # Instantiate the joint embedding layer (token and positional embeddings)
