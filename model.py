@@ -24,17 +24,15 @@ class JointEmbedding(nn.Module):
     * Position Embedding 
         Position of the word in the sentence encoded to a vector. Using a periodic funciton to encode embedding instead of learnable positional embeddings 
 
-    Atribute size: Size of the embedding 
-    Invariant: int
+    Args: 
+        vocab_size (int): Size of the vocabulary 
+        size (int): Size of the embedding 
 
-    Attribute tok_embed: Token Embedding 
-    Invariant: Embedding object (Tensor of size (vocab_size, size))
-
-    Attribute seg_embed: Segment Embedding 
-    Invariant: Embedding object (Tensor of size (vocab_size, size))
-
-    Artibute norm: Applied Layer Normalization
-    Invariant: Tensor
+    Attributes: 
+        size (int): Where we store size
+        tok_embed (Tensor): Token Embedding 
+        seg_embed (Tensor): Segment Embedding 
+        norm (Tensor): Applied Layer Normalization
     """
     def __init__ (self, vocab_size, size):
         super(JointEmbedding, self).__init__()
@@ -49,9 +47,6 @@ class JointEmbedding(nn.Module):
         self.norm = nn.LayerNorm(size)
 
     def forward(self, input_tensor):
-        """
-        
-        """
         sentence_size = input_tensor.size(-1)
         #Get positional encoding tensor
         pos_tensor = self.attention_position(self.size, input_tensor)
@@ -68,11 +63,12 @@ class JointEmbedding(nn.Module):
         """
         Returns positional encoding 
 
-        Parameter dim: Embedding size
-        Precondition: int, 0<dim
+        Args: 
+            dim (int): Embedding size
+            input_tensor (Tensor): Word token tensor 
 
-        Parameter input_tensor: Word token tensor 
-        Precondition: Tensor with size (batch size * sentence size)
+        Returns: 
+            pos (Tensor): Positional embedding
         """
         batch_size = input_tensor.size(0)
         sentence_size = input_tensor.size(-1)
@@ -91,23 +87,18 @@ class JointEmbedding(nn.Module):
         pos[:, 1::2] = torch.cos(pos[:, 1::2])
 
         #Extend pos on every element in batch
-        return pos.expand(batch_size, *pos.size())
+        pos = pos.expand(batch_size, *pos.size())
+        return pos
 
 class AttentionHead(nn.Module):
     """
     The attention module using scaled dot-product attention
-
-    Attribute innput_dim: The input dimensions 
-    Invariant: int
-
-    Attribute q: Query 
-    Invariant: Tensor
-
-    Attribute K: Key
-    Invariant: Tensor
-
-    Attribute V: Value
-    Invariant: Tensor
+    
+    Args:
+        input_dim (int): The input dimensions 
+        q (Tensor): Query 
+        k (Tensor): Key
+        v (Tensor): Value
     """
     def __init__(self, input_dim, output_dim):
         super(AttentionHead, self).__init__()
@@ -122,11 +113,12 @@ class AttentionHead(nn.Module):
         """
         A function that does Scaled Dot Product
 
-        Parameter input_tensor: The tensor of the output of JointEmbedding
-        Precondition: torch.tensor
-
-        Parameter attention_mask: Attention mask vector tgar masks [PAD] tokens
-        Precondition: torch.tensor
+        Args: 
+            input_tensor (Tensor): The tensor of the output of JointEmbedding
+            attention_mask (Tensor): Attention mask vector tgar masks [PAD] tokens
+        
+        Returns: 
+            context (Tensor): Contextualized representaion of words
         """
         #Calculate query, key and value tensors
         query, key, value = self.q(input_tensor), self.k(input_tensor), self.v(input_tensor)
@@ -146,14 +138,10 @@ class MultiHeadAttention(nn.Module):
     """
     Parallel AttentionHeads which retreives information from multiple representations 
 
-    Attribute heads: A list of all the Attention Heads
-    Invariant: ModuleList
-
-    Attribute Linear: Linear tranformation of data
-    Invariant: Tensor
-
-    Attribute norm: Layer normalization
-    Invariant: Tensor
+    Args: 
+        heads (ModuleList): A list of all the Attention Heads
+        Linear (Tensor): Linear tranformation of data
+        norm (Tensor): Layer normalization
     """
     def __init__(self, num_heads, dim_inp, dim_out) -> None:
         super(MultiHeadAttention, self).__init__()
@@ -177,19 +165,11 @@ class Encoder(nn.Module):
     """
     An encoder layer that has a Multi-Head Attention Layer and a Feed Forward Network 
 
-    Attribute attention: Multi-head attention layer 
-    Invariant: Tensor
-
-    Attribute norm1: Layer normalization 
-    Invariant: Tensor
-
-    Attribute feed_forward: Position wise feed-forward network
-    Invariant: Instance of nn.Sequential class
-
-    Attribute norm2: Layer normalization 
-    Invariant: Tensor
-
-
+    Args: 
+        attention (Tensor): Multi-head attention layer 
+        norm1 (Tensor): Layer normalization 
+        feed_forward (nn.Sequential): Position wise feed-forward network
+        norm2 (Tensor): Layer normalization
     """
     def __init__(self, dim_inp, dim_out, attention_heads=4, dropout=0.1):
         super(Encoder, self).__init__()
@@ -226,22 +206,14 @@ class BERT(nn.Module):
     """
     Container that combines all modules 
 
-    Attribute embedding: Embedding Layer
-    Invariant: Tensor
-
-    Attribute encoders: List of Encoder Layers 
-    Invariant: List[Tensor]
-
-    Attribute token_predicition_layer: Token predicition layer
-    Invariant: Tensor
-
-    Attribute softmax: Applies Softmax 
-    Invariant: Tensor 
-
-    Attribute classifiction_layer: Classification layer
-    Invariant: Tensor
+    Args: 
+        embedding (Tensor): Embedding Layer
+        encoders (List[Tensor]): List of Encoder Layers 
+        token_predicition_layer (Tensor): Token predicition layer
+        softmax (Tensor): Applies Softmax 
+        classifiction_layer (Tensor): Classification layer
     """
-    def __init__(self, vocab_size, dim_inp, dim_out, attention_heads=4, num_layers=2):
+    def __init__(self, vocab_size, dim_inp, dim_out, attention_heads=4, num_layers=12):
         super(BERT, self).__init__()
 
         # Instantiate the joint embedding layer (token and positional embeddings)
