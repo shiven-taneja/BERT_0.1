@@ -53,7 +53,7 @@ class JointEmbedding(nn.Module):
 
         #Get segment encoding tensor
         seg_tensor = torch.zeros_like(input_tensor).to(device)
-        seg_tensor = seg_tensor[:, sentence_size // 2 + 1:] = 1
+        seg_tensor[:, sentence_size // 2 + 1:] = seg_tensor[:, sentence_size // 2 + 1:].fill_(1)
 
         #Sum all the encoding then normalize them
         output = self.tok_embed(input_tensor) + self.seg_embed(seg_tensor) + pos_tensor

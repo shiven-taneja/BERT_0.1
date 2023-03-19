@@ -134,6 +134,12 @@ class WikitextBertDataset(Dataset):
         df = pd.DataFrame(nsp, columns=self.columns)
         return df
     
+    def _update_length(self, sentences: typing.List[str], lengths: typing.List[int]):
+        for v in sentences:
+            l = len(v.split())
+            lengths.append(l)
+        return lengths
+    
     def _find_optimal_sentence_length(self, lengths: typing.List[int]): 
         """
         Helper function for prepare_dataset method to calculate the optimal sentence length by finding the 70th percentile of sentence lengths from dataset
