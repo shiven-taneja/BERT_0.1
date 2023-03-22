@@ -13,7 +13,7 @@ with open('train_output.csv', 'w', newline="", encoding="utf-8") as out_file:
 with open('train_output_child.csv', 'w', newline="", encoding="utf-16") as out_file:
     csv_out = csv.writer(out_file)
     csv_out.writerow(['filename', 'Transcript'])
-    with open('/Users/pri/COG403 Final Project/BERT_0.1/Baby Data/childes.txt', 'r') as txt:
+    with open('childes.txt', 'r') as txt:
         as_string = " ".join(line.strip() for line in txt)
         csv_out.writerow(['childes_data', as_string])
     csv_out.close()
