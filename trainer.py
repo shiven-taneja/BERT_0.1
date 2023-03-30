@@ -273,7 +273,7 @@ class BertTrainer:
         print('=' * self._splitter_size)
         print(f"Restoring model {path}")
         checkpoint = torch.load(path)
-        self.current_epoch = checkpoint['epoch']
+        self.current_epoch = checkpoint['epoch'] + 1
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         print("Model is restored.")

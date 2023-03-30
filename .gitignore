@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 data_wikitext-103/bert_checkpoints/bert_epoch0_step-1_1679336425.pt
 data_wikitext-103/bert_checkpoints/bert_epoch1_step-1_1679388388.pt
 data_wikitext-103/bert_checkpoints/bert_epoch2_step-1_1679440342.pt
@@ -12,3 +13,5 @@ data_wikitext-103/logs/bert_experiment_1679509383.6637/events.out.tfevents.16794
 wikitext-103/wiki.test.tokens
 wikitext-103/wiki.train.tokens
 wikitext-103/wiki.valid.tokens
+data_wikitext-103
+data
