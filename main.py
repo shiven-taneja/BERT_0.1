@@ -4,7 +4,7 @@ import torch
 
 from pathlib import Path
 
-from dataset import WikitextBertDataset
+from dataset_childes import WikitextBertDataset
 from model import BERT
 from trainer import BertTrainer
 
@@ -30,7 +30,7 @@ if torch.cuda.is_available():
 
 if __name__ == '__main__':
     print("Prepare dataset")
-    ds = WikitextBertDataset(BASE_DIR.joinpath('data/train_output.csv'), ds_from=0, ds_to=809857)
+    ds = WikitextBertDataset(BASE_DIR.joinpath('data/train_output_child.csv'), ds_from=0, ds_to=9213)
 
     bert = BERT(len(ds.vocab), EMB_SIZE, HIDDEN_SIZE, NUM_HEADS).to(device)
     trainer = BertTrainer(
@@ -44,6 +44,5 @@ if __name__ == '__main__':
         learning_rate=0.00007,
         epochs=EPOCHS
     )
-    trainer.load_checkpoint(CHECKPOINT_DIR.joinpath('bert_epoch2_step-1_1679440342.pt'))
     trainer.print_summary()
     trainer()
