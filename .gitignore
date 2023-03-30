@@ -1,0 +1,14 @@
+data_wikitext-103/bert_checkpoints/bert_epoch0_step-1_1679336425.pt
+data_wikitext-103/bert_checkpoints/bert_epoch1_step-1_1679388388.pt
+data_wikitext-103/bert_checkpoints/bert_epoch2_step-1_1679440342.pt
+data_wikitext-103/bert_checkpoints/bert_epoch3_step-1_1679562110.pt
+data_wikitext-103/logs/bert_experiment_1679278168.907977/events.out.tfevents.1679264381.DESKTOP-7V0QIVF.4256.0
+data_wikitext-103/logs/bert_experiment_1679284076.426407/events.out.tfevents.1679270294.DESKTOP-7V0QIVF.21544.0
+data_wikitext-103/logs/bert_experiment_1679459540.22015/events.out.tfevents.1679445794.DESKTOP-7V0QIVF.26512.0
+data_wikitext-103/logs/bert_experiment_1679460794.951477/events.out.tfevents.1679447035.DESKTOP-7V0QIVF.21964.0
+data_wikitext-103/logs/bert_experiment_1679462435.165099/events.out.tfevents.1679448643.DESKTOP-7V0QIVF.19828.0
+data_wikitext-103/logs/bert_experiment_1679463353.600228/events.out.tfevents.1679449584.DESKTOP-7V0QIVF.2728.0
+data_wikitext-103/logs/bert_experiment_1679509383.6637/events.out.tfevents.1679495600.DESKTOP-7V0QIVF.7248.0
+wikitext-103/wiki.test.tokens
+wikitext-103/wiki.train.tokens
+wikitext-103/wiki.valid.tokens
