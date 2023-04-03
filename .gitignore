@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 data_wikitext-103/bert_checkpoints/bert_epoch0_step-1_1679336425.pt
 data_wikitext-103/bert_checkpoints/bert_epoch1_step-1_1679388388.pt
 data_wikitext-103/bert_checkpoints/bert_epoch2_step-1_1679440342.pt
@@ -14,3 +15,17 @@ wikitext-103/wiki.train.tokens
 wikitext-103/wiki.valid.tokens
 data_wikitext-103
 data
+HF Logs
+output
+Trained HF Models
+wikitext-103
+childes.txt
+childes.txt
+child_text.txt
+children_stories.csv
+__pycache__
+BABYBERTA
+children_books.csv
+__pycache__/dataset_childes.cpython-310.pyc
+__pycache__/model.cpython-310.pyc
+train_output_child.txt
