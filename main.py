@@ -45,4 +45,4 @@ if __name__ == '__main__':
         epochs=EPOCHS
     )
     trainer.print_summary()
-    trainer()
+    # trainer()

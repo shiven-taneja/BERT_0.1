@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 import torch.nn.functional as f
+from transformers import BertConfig, PreTrainedModel
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -213,16 +215,17 @@ class BERT(nn.Module):
         softmax (Tensor): Applies Softmax 
         classifiction_layer (Tensor): Classification layer
     """
-    def __init__(self, vocab_size, dim_inp, dim_out, attention_heads=4, num_layers=4):
+    def __init__(self, vocab_size, dim_inp, dim_out, attention_heads=6, num_layers=4):
         super(BERT, self).__init__()
-
+        print('VOCAB:', vocab_size, 'IN:', dim_inp, 'OUT:', dim_out)
         # Instantiate the joint embedding layer (token and positional embeddings)
         self.embedding = JointEmbedding(vocab_size, dim_inp)
         # Create a list of Encoder layers
         self.encoders = nn.ModuleList([
             Encoder(dim_inp, dim_out, attention_heads) for _ in range(num_layers)
         ])
-
+        config = BertConfig(vocab_size=vocab_size, hidden_size=dim_out, num_attention_heads=attention_heads)
+        self.config = config
         # Define the token prediction layer for masked language modeling
         self.token_prediction_layer = nn.Linear(dim_inp, vocab_size)
         # Define the softmax activation for token predictions
