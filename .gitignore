@@ -29,3 +29,4 @@ children_books.csv
 __pycache__/dataset_childes.cpython-310.pyc
 __pycache__/model.cpython-310.pyc
 train_output_child.txt
+wiki_train.txt
