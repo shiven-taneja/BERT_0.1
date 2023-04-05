@@ -20,7 +20,7 @@ class CustomDataset(Dataset):
 
 # 3. Tokenize the dataset
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-train_dataset = CustomDataset("childes.txt", tokenizer)
+train_dataset = CustomDataset("wiki_train.txt", tokenizer)
 
 # 4. Create a data loader
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=True, mlm_probability=0.15)
@@ -37,7 +37,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=8,
     save_steps=10_000,
     save_total_limit=2,
-    logging_dir="./logs_childes_4_epoch",
+    logging_dir="HF Logs\\logs_wiki_text_4_epoch",
     logging_steps=100,
     seed=42,
 )
@@ -52,5 +52,5 @@ trainer = Trainer(
 trainer.train()
 
 # 7. Save the trained model
-trainer.save_model("./trained_bert_mlm_childes_4_epoch")
-tokenizer.save_pretrained("./trained_bert_mlm_childes_4_epoch")
+trainer.save_model("Trained HF Models/trained_bert_mlm_wiki_text_4_epoch")
+tokenizer.save_pretrained("Trained HF Models/trained_bert_mlm_wiki_text_4_epoch")
