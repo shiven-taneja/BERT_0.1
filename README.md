@@ -8,3 +8,8 @@ Beyond this we also used such datasets to evaluate a given Bert-uncased model (p
 
 Abstract:
 The transformer architecture, specifically BERT (Bidirectional Encoder Representations from Transformers), has recently become a popular choice for Natural Language Processing (NLP) tasks. This is due to its ability to capture long-term dependencies as well as contextual information. This paper aims to investigate the influence of pre-training datasets on BERT models, focusing on child language data, which is characterized by variability and variations from common linguistic structures. By replicating a BERT model, we were able to examine the loss difference between different pre-training datasets. We then evaluated the performance of a Hugging Face Bert model pretrained on these different datasets (both child oriented and adult oriented) on a Masked Language Modeling task with different grammatical sentence structures. We found that all the models were able to capture the correct grammatical parts of speech but failed to consider specific contextual information which is likely due to insufficient training time. The large differences in the sizes of the datasets may have impeded our ability to isolate the effects of training on child-directed inputs and thus further investigation is necessary.
+
+
+Created by: 
+Shiven Taneja (https://github.com/shiven-taneja)
+Priyanka Shakira Raj (https://github.com/prishakira)
