@@ -1,5 +1,7 @@
 # BERT_0.1
 
+Investigating the Impact of Pre-training on Child Language Data for BERT Models and its Performance on Downstream Grammatical Tasks
+
 The following project is the creation of a limited BERT model based on the guidance of a Coaxsoft tutorial (https://coaxsoft.com/blog/building-bert-with-pytorch-from-scratch). Beyond building the model, we use data from a collection of child-direct corpora (CHILDES dataset, children stories dataset from Hugging Face, and children book dataset from Hugging Face) as well as standard corpora (Wikitext-103-v1 from Hugging Face) in order to pre-train our model and analyze MLM and NSP loss functions.
 
 Beyond this we also used such datasets to evaluate a given Bert-uncased model (provided by Hugging Face) on downstream MLM tasks, such that we can explore the grammatical aspects that are captured and not captured by the model when pre-trained on the different quality and quantity of data. 
